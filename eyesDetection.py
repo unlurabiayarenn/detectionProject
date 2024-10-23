@@ -130,8 +130,8 @@ while True:
         if left_label == "Acik":
             cv2.imwrite(os.path.join(save_dir, 'open', f'open_{count_open}.jpg'), frame)
 
-        cv2.putText(frame, f"Sol Goz: {left_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-        cv2.putText(frame, f"Sag Goz: {right_label}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        cv2.putText(frame, f"Sag Goz: {left_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        cv2.putText(frame, f"Sol Goz: {right_label}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
         # Göz çevresindeki noktaları çiz
         for (x, y) in left_eye:
