@@ -123,7 +123,6 @@ while True:
         right_label = "Kapali" if right_prediction < 0.5 else "Acik"
 
         # Görüntüyü kaydet
-        # Görüntüyü kaydet
         if left_label == "Kapali":
             cv2.imwrite(os.path.join(save_dir, 'closed', f'closed_{count_closed}.jpg'), frame)
 
