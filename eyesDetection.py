@@ -22,14 +22,19 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 # Veri yükleme fonksiyonu
 def load_data(csv_file):
     df = pd.read_csv(csv_file)
-    images = []
-    labels = []
-    for index, row in df.iterrows():
-        img = cv2.imread(row['image_path'])  # image_path sütununu kullanmalısınız
-        img = cv2.resize(img, (34, 26))  # Boyutlandır
+    labels = df['state'].values  # 'state' sütununu kullanıyoruz
+    images = []  # Görsel veriler burada oluşturulacak
+
+    # Göz durumlarına göre sahte görüntüler oluşturma
+    for label in labels:
+        if label == 'open':
+            img = np.ones((26, 34, 1))  # Açık göz için beyaz görüntü
+        else:
+            img = np.zeros((26, 34, 1))  # Kapalı göz için siyah görüntü
+
         images.append(img)
-        labels.append(row['label'])  # label sütununu kullanmalısınız
-    return np.array(images), np.array(labels)
+
+    return np.array(images), labels
 
 # CNN Modelini Oluşturma
 def create_model():
@@ -46,10 +51,11 @@ def create_model():
     return model
 
 # Veri setini yükle
-csv_file = '/path/to/dataset_eye_on_off.csv'  # CSV dosyasının yolu
+csv_file = '/Users/rabiayarenunlu/PycharmProjects/detectionProject/dataset_eye_on_off.csv'  # CSV dosyasının yolu
 X, y = load_data(csv_file)
-X = X / 255.0  # Normalize
-y = y.astype(np.float32)
+
+# Etiketleri sayısal değerlere dönüştür
+y = np.where(y == 'open', 1, 0).astype(np.float32)  # "open" = 1, "close" = 0
 
 # Veriyi eğitim ve test olarak ayır
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
