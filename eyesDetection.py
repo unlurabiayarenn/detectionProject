@@ -150,7 +150,7 @@ while True:
         cv2.putText(frame, f"Sol Göz: {left_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
         cv2.putText(frame, f"Sağ Göz: {right_label}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
-        # Göz çevresindeki noktaları çiz
+        # Göz çevresindeki noktaları çiz:
         for (x, y) in left_eye:
             cv2.circle(frame, (x, y), 2, (255, 0, 0), -1)
         for (x, y) in right_eye:
