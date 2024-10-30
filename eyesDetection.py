@@ -22,16 +22,14 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 # Veri yükleme fonksiyonu
 def load_data(csv_file):
     df = pd.read_csv(csv_file)
-    labels = df['state'].values  # 'state' sütununu kullanıyoruz
-    images = []  # Görsel veriler burada oluşturulacak
+    labels = df['state'].values
+    images = []
 
-    # Göz durumlarına göre sahte görüntüler oluşturma
     for label in labels:
         if label == 'open':
-            img = np.ones((26, 34, 1))  # Açık göz için beyaz görüntü
+            img = np.ones((26, 34, 1))
         else:
-            img = np.zeros((26, 34, 1))  # Kapalı göz için siyah görüntü
-
+            img = np.zeros((26, 34, 1))
         images.append(img)
 
     return np.array(images), labels
@@ -39,7 +37,7 @@ def load_data(csv_file):
 # CNN Modelini Oluşturma
 def create_model():
     model = Sequential()
-    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(34, 26, 1)))  # Giriş şekli
+    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(26, 34, 1)))  # Giriş şekli
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Conv2D(64, (3, 3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -55,7 +53,7 @@ csv_file = '/Users/rabiayarenunlu/PycharmProjects/detectionProject/dataset_eye_o
 X, y = load_data(csv_file)
 
 # Etiketleri sayısal değerlere dönüştür
-y = np.where(y == 'open', 1, 0).astype(np.float32)  # "open" = 1, "close" = 0
+y = np.where(y == 'open', 1, 0).astype(np.float32)
 
 # Veriyi eğitim ve test olarak ayır
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -71,7 +69,7 @@ if not cap.isOpened():
     exit()
 
 # Kayıt dizinleri
-save_dir = '/Users/rabiayarenunlu/PycharmProjects/detectionProject/data/train'  # Kayıt dizininin yolu
+save_dir = '/Users/rabiayarenunlu/PycharmProjects/detectionProject/data/train'
 os.makedirs(os.path.join(save_dir, 'closed'), exist_ok=True)
 os.makedirs(os.path.join(save_dir, 'open'), exist_ok=True)
 
@@ -101,25 +99,37 @@ while True:
         right_ear = eye_aspect_ratio(right_eye)
 
         # Göz oranlarını kullanarak tahmini değerlendir
-        ear_threshold = 0.25  # Eşik değeri
+        ear_threshold = 0.25
 
         left_label = "Kapalı" if left_ear < ear_threshold else "Açık"
         right_label = "Kapalı" if right_ear < ear_threshold else "Açık"
 
         # Göz görüntülerini kes ve işle
-        eye_offset = 10  # Göz alanını genişletmek için bir offset belirle
+        eye_offset = 5  # Göz alanını genişletmek için bir offset belirle
 
         # Sol göz için
-        left_eye_img = frame[
-                       max(left_eye[1][1] - eye_offset, 0): left_eye[5][1] + eye_offset,
-                       max(left_eye[0][0] - eye_offset, 0): left_eye[3][0] + eye_offset
-                       ]
+        left_eye_center = left_eye.mean(axis=0).astype(int)
+        left_eye_height = left_eye[5][1] - left_eye[1][1]
+        left_eye_width = left_eye[3][0] - left_eye[0][0]
+
+        left_eye_top = max(left_eye_center[1] - int(left_eye_height / 2) - eye_offset, 0)
+        left_eye_bottom = min(left_eye_center[1] + int(left_eye_height / 2) + eye_offset, frame.shape[0])
+        left_eye_left = max(left_eye_center[0] - int(left_eye_width / 2) - eye_offset, 0)
+        left_eye_right = min(left_eye_center[0] + int(left_eye_width / 2) + eye_offset, frame.shape[1])
+
+        left_eye_img = frame[left_eye_top:left_eye_bottom, left_eye_left:left_eye_right]
 
         # Sağ göz için
-        right_eye_img = frame[
-                        max(right_eye[1][1] - eye_offset, 0): right_eye[5][1] + eye_offset,
-                        max(right_eye[0][0] - eye_offset, 0): right_eye[3][0] + eye_offset
-                        ]
+        right_eye_center = right_eye.mean(axis=0).astype(int)
+        right_eye_height = right_eye[5][1] - right_eye[1][1]
+        right_eye_width = right_eye[3][0] - right_eye[0][0]
+
+        right_eye_top = max(right_eye_center[1] - int(right_eye_height / 2) - eye_offset, 0)
+        right_eye_bottom = min(right_eye_center[1] + int(right_eye_height / 2) + eye_offset, frame.shape[0])
+        right_eye_left = max(right_eye_center[0] - int(right_eye_width / 2) - eye_offset, 0)
+        right_eye_right = min(right_eye_center[0] + int(right_eye_width / 2) + eye_offset, frame.shape[1])
+
+        right_eye_img = frame[right_eye_top:right_eye_bottom, right_eye_left:right_eye_right]
 
         # Görüntüleri yeniden boyutlandır ve normalleştir
         left_eye_img = cv2.resize(left_eye_img, (34, 26))
@@ -156,7 +166,7 @@ while True:
         for (x, y) in right_eye:
             cv2.circle(frame, (x, y), 2, (255, 0, 0), -1)
 
-    cv2.imshow("Açık veya Kapalı", frame)
+    cv2.imshow("Acik veya Kapali", frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
