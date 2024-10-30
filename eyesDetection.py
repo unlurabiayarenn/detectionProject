@@ -7,7 +7,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from sklearn.model_selection import train_test_split
 
-# Göz oranı hesaplamak için kullanılan fonksiyon
+# Göz oranı hesaplamak için kullanılan fonksiyon, numpy üzerinde hesaplama yapıldı
 def eye_aspect_ratio(eye):
     A = np.linalg.norm(eye[1] - eye[5])  # Üst alt mesafe
     B = np.linalg.norm(eye[2] - eye[4])  # İç dış mesafe
