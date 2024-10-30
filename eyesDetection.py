@@ -31,7 +31,6 @@ def load_data(csv_file):
         else:
             img = np.zeros((26, 34, 1))
         images.append(img)
-
     return np.array(images), labels
 
 # CNN Modelini Oluşturma
@@ -100,7 +99,6 @@ while True:
 
         # Göz oranlarını kullanarak tahmini değerlendir
         ear_threshold = 0.25
-
         left_label = "Kapalı" if left_ear < ear_threshold else "Açık"
         right_label = "Kapalı" if right_ear < ear_threshold else "Açık"
 
@@ -111,31 +109,26 @@ while True:
         left_eye_center = left_eye.mean(axis=0).astype(int)
         left_eye_height = left_eye[5][1] - left_eye[1][1]
         left_eye_width = left_eye[3][0] - left_eye[0][0]
-
         left_eye_top = max(left_eye_center[1] - int(left_eye_height / 2) - eye_offset, 0)
         left_eye_bottom = min(left_eye_center[1] + int(left_eye_height / 2) + eye_offset, frame.shape[0])
         left_eye_left = max(left_eye_center[0] - int(left_eye_width / 2) - eye_offset, 0)
         left_eye_right = min(left_eye_center[0] + int(left_eye_width / 2) + eye_offset, frame.shape[1])
-
         left_eye_img = frame[left_eye_top:left_eye_bottom, left_eye_left:left_eye_right]
 
         # Sağ göz için
         right_eye_center = right_eye.mean(axis=0).astype(int)
         right_eye_height = right_eye[5][1] - right_eye[1][1]
         right_eye_width = right_eye[3][0] - right_eye[0][0]
-
         right_eye_top = max(right_eye_center[1] - int(right_eye_height / 2) - eye_offset, 0)
         right_eye_bottom = min(right_eye_center[1] + int(right_eye_height / 2) + eye_offset, frame.shape[0])
         right_eye_left = max(right_eye_center[0] - int(right_eye_width / 2) - eye_offset, 0)
         right_eye_right = min(right_eye_center[0] + int(right_eye_width / 2) + eye_offset, frame.shape[1])
-
         right_eye_img = frame[right_eye_top:right_eye_bottom, right_eye_left:right_eye_right]
 
         # Görüntüleri yeniden boyutlandır ve normalleştir
         left_eye_img = cv2.resize(left_eye_img, (34, 26))
         left_eye_img = cv2.cvtColor(left_eye_img, cv2.COLOR_BGR2GRAY)
         left_eye_img = left_eye_img.reshape((26, 34, 1)) / 255.0
-
         right_eye_img = cv2.resize(right_eye_img, (34, 26))
         right_eye_img = cv2.cvtColor(right_eye_img, cv2.COLOR_BGR2GRAY)
         right_eye_img = right_eye_img.reshape((26, 34, 1)) / 255.0
