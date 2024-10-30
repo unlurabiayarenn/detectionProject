@@ -25,12 +25,18 @@ def load_data(csv_file):
     labels = df['state'].values
     images = []
 
-    for label in labels:
-        if label == 'open':
-            img = np.ones((26, 34, 1))
-        else:
-            img = np.zeros((26, 34, 1))
+    for index, row in df.iterrows():
+        img_path = os.path.join(images_folder, row['filename'])  # Resim dosyasının tam yolu
+        img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)  # Resmi yükle
+
+        if img is None:
+            print(f"Resim yüklenemedi: {img_path}")
+            continue
+
+        img = cv2.resize(img, (34, 26))  # Boyutlandır
+        img = img.reshape((26, 34, 1)) / 255.0  # Normalleştir
         images.append(img)
+
     return np.array(images), labels
 
 # CNN Modelini Oluşturma
@@ -48,8 +54,9 @@ def create_model():
     return model
 
 # Veri setini yükle
-csv_file = '/Users/rabiayarenunlu/PycharmProjects/detectionProject/dataset_eye_on_off.csv'  # CSV dosyasının yolu
-X, y = load_data(csv_file)
+csv_file = '/Users/rabiayarenunlu/PycharmProjects/detectionProject/dataset_eye_on_off.csv' # csv file bulunduğu dizin
+images_folder = '/Users/rabiayarenunlu/PycharmProjects/detectionProject/data'  # Resimlerin bulunduğu dizin
+X, y = load_data(csv_file, images_folder)
 
 # Etiketleri sayısal değerlere dönüştür
 y = np.where(y == 'open', 1, 0).astype(np.float32)
